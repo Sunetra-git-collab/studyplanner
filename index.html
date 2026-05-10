@@ -1,0 +1,1455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>StudyPlanner – Plan. Focus. Achieve.</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root{--bg:#0d0d1a;--sidebar:#111127;--card:#161628;--card2:#1c1c35;--border:rgba(255,255,255,0.07);--purple:#7c5cfc;--purple-light:#9b7fff;--purple-dim:rgba(124,92,252,0.18);--green:#22c55e;--yellow:#f59e0b;--red:#ef4444;--text:#e8e8f0;--muted:#8888aa;--radius:14px}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;display:flex;height:100vh;overflow:hidden}
+.sidebar{width:220px;min-width:220px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:20px 12px;gap:4px;overflow-y:auto;position:relative;z-index:10}
+.logo{display:flex;align-items:center;gap:10px;padding:4px 8px 20px}
+.logo-icon{width:38px;height:38px;background:var(--purple);border-radius:10px;display:grid;place-items:center;font-size:18px}
+.logo-text strong{font-family:'Space Grotesk',sans-serif;font-size:1.15rem}
+.logo-text strong span{color:var(--purple-light)}
+.logo-text small{color:var(--muted);font-size:.72rem}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:10px;color:var(--muted);cursor:pointer;font-size:.88rem;font-weight:500;transition:background .18s,color .18s;text-decoration:none;background:transparent}
+.nav-item:hover{background:var(--purple-dim);color:var(--text)}
+.nav-item.active{background:var(--purple);color:#fff}
+.nav-item svg{width:17px;height:17px;flex-shrink:0}
+.sidebar-spacer{flex:1}
+.motivation-card{background:linear-gradient(145deg,#1a1040,#0d1a3a);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-top:8px;position:relative;overflow:hidden}
+.motivation-card::after{content:'🌙';position:absolute;right:10px;bottom:6px;font-size:2rem;opacity:.4}
+.motivation-card .tag{color:var(--yellow);font-size:.75rem;font-weight:600;margin-bottom:6px}
+.motivation-card p{font-size:.8rem;line-height:1.5;font-style:italic}
+.motivation-card .author{color:var(--muted);font-size:.72rem;margin-top:6px}
+.logout{display:flex;align-items:center;gap:8px;padding:10px 12px;color:var(--muted);font-size:.85rem;cursor:pointer;border-radius:10px;transition:color .18s,background .18s;margin-top:8px}
+.logout:hover{color:var(--red);background:rgba(239,68,68,.08)}
+.main{flex:1;display:flex;flex-direction:column;overflow:hidden}
+.topbar{display:flex;align-items:center;gap:16px;padding:16px 24px;border-bottom:1px solid var(--border);background:var(--sidebar)}
+.greeting{flex:1}
+.greeting h1{font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:600}
+.greeting p{color:var(--muted);font-size:.8rem;margin-top:2px}
+.date-pill{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:.82rem}
+.date-pill .d1{font-weight:600}
+.date-pill .d2{color:var(--muted);font-size:.75rem}
+.search-bar{display:flex;align-items:center;gap:8px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 14px;font-size:.82rem;color:var(--muted);width:200px}
+.notif-btn{position:relative;background:var(--card);border:1px solid var(--border);border-radius:10px;width:38px;height:38px;display:grid;place-items:center;cursor:pointer}
+.notif-btn .badge{position:absolute;top:-4px;right:-4px;background:var(--red);color:#fff;width:16px;height:16px;border-radius:50%;font-size:.65rem;display:grid;place-items:center}
+.avatar{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#7c5cfc,#ec4899);display:grid;place-items:center;font-size:1.1rem;cursor:pointer}
+.content{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:18px}
+.content::-webkit-scrollbar{width:6px}
+.content::-webkit-scrollbar-thumb{background:rgba(255,255,255,.1);border-radius:99px}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px}
+.sc-head{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sc-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;font-size:1.1rem}
+.sc-label{color:var(--muted);font-size:.78rem}
+.sc-value{font-family:'Space Grotesk',sans-serif;font-size:1.9rem;font-weight:700;line-height:1}
+.sc-sub{color:var(--muted);font-size:.75rem;margin-top:4px}
+.progress-bar{height:5px;background:rgba(255,255,255,.08);border-radius:99px;margin-top:12px;overflow:hidden}
+.progress-fill{height:100%;border-radius:99px;transition:width .6s ease}
+.sc-pct{text-align:right;color:var(--muted);font-size:.72rem;margin-top:4px}
+.mid-row{display:grid;grid-template-columns:1fr 420px;gap:14px}
+.chart-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.card-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px}
+.card-head h3{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600}
+.card-head p{color:var(--muted);font-size:.75rem;margin-top:2px}
+.pill-btn{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:4px 10px;font-size:.75rem;color:var(--muted);cursor:pointer;display:flex;align-items:center;gap:4px}
+.legend{display:flex;gap:16px;margin-bottom:10px}
+.legend-item{display:flex;align-items:center;gap:6px;font-size:.75rem;color:var(--muted)}
+.legend-dot{width:8px;height:2px;border-radius:2px}
+.chart-wrap{width:100%;overflow:hidden}
+.chart-wrap svg{width:100%;display:block}
+.plan-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;gap:0}
+.plan-item{display:flex;align-items:flex-start;gap:14px;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;transition:background .15s;border-radius:6px;padding-left:6px}
+.plan-item:last-child{border-bottom:none}
+.plan-item:hover{background:var(--card2)}
+.plan-time{color:var(--muted);font-size:.75rem;width:80px;flex-shrink:0;line-height:1.6}
+.plan-body{flex:1}
+.plan-body strong{font-size:.86rem;font-weight:600;display:block}
+.plan-body span{color:var(--muted);font-size:.75rem}
+.status-badge{font-size:.7rem;font-weight:600;padding:3px 9px;border-radius:99px;white-space:nowrap;flex-shrink:0}
+.done{background:rgba(34,197,94,.12);color:var(--green)}
+.inprogress{background:rgba(124,92,252,.15);color:var(--purple-light)}
+.pending{background:rgba(255,255,255,.06);color:var(--muted)}
+.view-link{color:var(--purple-light);font-size:.78rem;cursor:pointer}
+.bottom-row{display:grid;grid-template-columns:300px 1fr 1fr;gap:14px}
+.timer-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;flex-direction:column;align-items:center;gap:12px}
+.timer-card .card-head{width:100%;margin-bottom:0}
+.timer-ring{position:relative;width:130px;height:130px}
+.timer-ring svg{transform:rotate(-90deg)}
+.timer-ring .timer-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.timer-text .t-val{font-family:'Space Grotesk',sans-serif;font-size:1.7rem;font-weight:700}
+.timer-text .t-label{color:var(--muted);font-size:.7rem}
+.timer-sub{color:var(--muted);font-size:.75rem}
+.timer-btns{display:flex;gap:10px;width:100%}
+.btn-primary{flex:1;background:var(--purple);color:#fff;border:none;border-radius:10px;padding:10px;font-size:.85rem;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;transition:opacity .18s}
+.btn-primary:hover{opacity:.85}
+.btn-icon{background:var(--card2);border:1px solid var(--border);border-radius:10px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer;transition:background .18s}
+.proc-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.donut-row{display:flex;align-items:center;gap:18px}
+.donut-wrap{position:relative;width:110px;height:110px;flex-shrink:0}
+.donut-wrap svg{display:block}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-center strong{font-family:'Space Grotesk',sans-serif;font-size:1.1rem}
+.donut-center small{color:var(--muted);font-size:.65rem}
+.proc-legend{display:flex;flex-direction:column;gap:6px}
+.proc-item{display:flex;align-items:center;gap:8px;font-size:.78rem}
+.proc-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}
+.proc-name{flex:1}
+.proc-time{color:var(--muted)}
+.tip-bar{margin-top:12px;background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;font-size:.75rem;color:var(--muted)}
+.tip-bar span{color:var(--red)}
+.weekly-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px}
+.weekly-stats{display:flex;gap:20px;margin:12px 0}
+.wstat{flex:1}
+.wstat .ws-label{color:var(--muted);font-size:.72rem}
+.wstat .ws-val{font-family:'Space Grotesk',sans-serif;font-size:1.35rem;font-weight:700}
+.wstat .ws-change{color:var(--green);font-size:.72rem;margin-top:2px}
+.bar-chart{display:flex;align-items:flex-end;gap:8px;height:70px;padding-top:4px}
+.bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+.bar-fill{width:100%;background:var(--purple);border-radius:5px 5px 0 0;min-height:4px;opacity:.75}
+.bar-fill.today{opacity:1}
+.bar-label{color:var(--muted);font-size:.65rem}
+.goals-row{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:18px;display:flex;align-items:center;gap:20px}
+.goals-row h3{font-family:'Space Grotesk',sans-serif;font-size:1rem;font-weight:600;flex-shrink:0}
+.goal-item{display:flex;align-items:center;gap:10px;flex:1}
+.goal-icon{font-size:1.5rem}
+.goal-info .gi-name{font-size:.78rem;font-weight:600}
+.goal-info .gi-prog{color:var(--muted);font-size:.72rem}
+.goal-bar{flex:1}
+.goal-bar .progress-bar{height:4px;margin-top:4px}
+.achievement-badge{display:flex;align-items:center;gap:12px;background:linear-gradient(135deg,rgba(124,92,252,.15),rgba(236,72,153,.1));border:1px solid rgba(124,92,252,.3);border-radius:12px;padding:10px 16px}
+.badge-icon{font-size:2rem}
+.badge-text .bt1{font-size:.82rem;font-weight:700;color:var(--purple-light)}
+.badge-text .bt2{color:var(--muted);font-size:.72rem}
+.section-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.section-card h2{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;margin-bottom:14px}
+.section-card select,.section-card input[type=text],.section-card textarea{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 12px;font-size:.85rem;margin-bottom:10px;width:100%;outline:none}
+.section-card select:focus,.section-card input[type=text]:focus,.section-card textarea:focus{border-color:rgba(124,92,252,.5)}
+.section-card button{background:var(--purple);color:#fff;border:none;border-radius:8px;padding:8px 18px;cursor:pointer;font-size:.85rem;transition:opacity .18s}
+.section-card button:hover{opacity:.85}
+.section-card ul{list-style:none;margin-top:12px;display:flex;flex-direction:column;gap:8px}
+.section-card ul li{background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;white-space:pre-line;display:flex;justify-content:space-between;align-items:flex-start}
+.section-card ul li a{color:var(--purple-light)}
+.section-card ul li button{background:transparent;border:none;cursor:pointer;padding:0;font-size:.85rem;color:var(--red)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+.pulsing .t-val{animation:pulse 1.2s infinite}
+
+/* ═══════ API KEY MODAL ═══════ */
+#apiKeyModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);display:flex;justify-content:center;align-items:center;z-index:9999}
+.api-modal-inner{background:#161628;padding:28px;width:90%;max-width:480px;border-radius:16px;border:1px solid rgba(124,92,252,.4);color:var(--text)}
+.api-modal-inner h2{font-family:'Space Grotesk',sans-serif;color:var(--purple-light);margin-bottom:8px;font-size:1.2rem}
+.api-modal-inner p{color:var(--muted);font-size:.83rem;line-height:1.5;margin-bottom:16px}
+.api-modal-inner input{width:100%;background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:10px 14px;font-size:.87rem;outline:none;margin-bottom:12px;font-family:'DM Sans',sans-serif}
+.api-modal-inner input:focus{border-color:rgba(124,92,252,.5)}
+.api-modal-inner .api-btns{display:flex;gap:10px}
+.api-modal-inner button.save{flex:1;background:var(--purple);color:#fff;border:none;border-radius:8px;padding:10px;cursor:pointer;font-size:.87rem;font-weight:600;transition:opacity .18s}
+.api-modal-inner button.save:hover{opacity:.85}
+.api-modal-inner button.skip{background:var(--card2);color:var(--muted);border:1px solid var(--border);border-radius:8px;padding:10px 16px;cursor:pointer;font-size:.87rem;transition:all .18s}
+.api-modal-inner button.skip:hover{color:var(--text)}
+.api-modal-inner .api-note{font-size:.73rem;color:var(--muted);margin-top:10px;line-height:1.4}
+.api-modal-inner .api-note a{color:var(--purple-light)}
+
+/* ═══════ CHATBOT ═══════ */
+@keyframes fadeInUp{from{opacity:0;transform:translateY(16px) scale(.95)}to{opacity:1;transform:none}}
+@keyframes typingB{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+@keyframes vwave{from{transform:scaleY(.25)}to{transform:scaleY(1)}}
+@keyframes fabP{0%{transform:scale(1);opacity:.5}100%{transform:scale(1.65);opacity:0}}
+
+.chat-fab{position:fixed;bottom:28px;right:28px;width:62px;height:62px;background:linear-gradient(135deg,#7c5cfc,#ec4899);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:0 8px 32px rgba(124,92,252,.55);z-index:1000;border:none;transition:transform .2s,box-shadow .2s}
+.chat-fab:hover{transform:scale(1.1);box-shadow:0 12px 42px rgba(124,92,252,.75)}
+.fab-icon{font-size:1.6rem;transition:transform .3s}
+.chat-fab.open .fab-icon{transform:rotate(45deg)}
+.fab-ring{position:absolute;width:100%;height:100%;border-radius:50%;background:rgba(124,92,252,.4);animation:fabP 2s ease-out infinite}
+
+.chat-win{position:fixed;bottom:104px;right:28px;width:445px;height:645px;background:#0f0f22;border:1px solid rgba(124,92,252,.28);border-radius:22px;display:flex;flex-direction:column;z-index:999;box-shadow:0 28px 90px rgba(0,0,0,.7);transform:scale(.85) translateY(28px);opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.34,1.56,.64,1);overflow:hidden}
+.chat-win.open{transform:scale(1) translateY(0);opacity:1;pointer-events:all}
+
+.chat-hdr{display:flex;align-items:center;gap:12px;padding:14px 18px;background:linear-gradient(135deg,rgba(124,92,252,.22),rgba(236,72,153,.1));border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.bot-av{width:44px;height:44px;background:linear-gradient(135deg,#7c5cfc,#ec4899);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:1.35rem;flex-shrink:0;position:relative;box-shadow:0 4px 16px rgba(124,92,252,.4)}
+.ondot{position:absolute;bottom:1px;right:1px;width:11px;height:11px;background:#22c55e;border-radius:50%;border:2px solid #0f0f22}
+.hdr-info{flex:1}
+.hdr-info h4{font-family:'Space Grotesk',sans-serif;font-size:.97rem;font-weight:700}
+.hdr-info p{font-size:.72rem;color:#22c55e;margin-top:1px}
+.hdr-acts{display:flex;gap:6px}
+.hbtn{width:32px;height:32px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);border-radius:8px;display:grid;place-items:center;cursor:pointer;color:var(--muted);font-size:.9rem;transition:all .18s}
+.hbtn:hover{background:rgba(255,255,255,.12);color:var(--text)}
+.hbtn.key-btn{font-size:.75rem;width:auto;padding:0 8px;gap:3px}
+
+.subj-bar{padding:10px 14px;border-bottom:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.subj-bar-lbl{font-size:.69rem;color:var(--muted);margin-bottom:6px;font-weight:600;text-transform:uppercase;letter-spacing:.05em}
+.chips-row{display:flex;gap:6px;overflow-x:auto;padding-bottom:2px}
+.chips-row::-webkit-scrollbar{display:none}
+.chip{display:flex;align-items:center;gap:5px;padding:5px 11px;background:var(--card2);border:1px solid var(--border);border-radius:99px;font-size:.73rem;color:var(--muted);cursor:pointer;white-space:nowrap;transition:all .18s;flex-shrink:0}
+.chip:hover,.chip.sel{background:rgba(124,92,252,.2);color:var(--purple-light);border-color:rgba(124,92,252,.45)}
+
+.msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:12px;scroll-behavior:smooth}
+.msgs::-webkit-scrollbar{width:4px}
+.msgs::-webkit-scrollbar-thumb{background:rgba(255,255,255,.08);border-radius:99px}
+
+.msg{display:flex;gap:8px;animation:fadeInUp .25s ease}
+.msg.usr{flex-direction:row-reverse}
+.av{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;font-size:.9rem;flex-shrink:0;align-self:flex-end}
+.msg.bot .av{background:linear-gradient(135deg,#7c5cfc,#ec4899)}
+.msg.usr .av{background:linear-gradient(135deg,#22c55e,#16a34a)}
+.mbody{max-width:calc(100% - 44px)}
+.bbl{padding:10px 14px;border-radius:16px;font-size:.845rem;line-height:1.62;word-break:break-word}
+.msg.bot .bbl{background:#1c1c38;border:1px solid rgba(255,255,255,.07);border-bottom-left-radius:4px;color:var(--text)}
+.msg.usr .bbl{background:linear-gradient(135deg,#7c5cfc,#9b7fff);color:#fff;border-bottom-right-radius:4px}
+.mtime{font-size:.63rem;color:var(--muted);margin-top:4px;padding:0 2px}
+.msg.usr .mtime{text-align:right}
+.bbl .step{display:flex;gap:8px;margin:5px 0;align-items:flex-start}
+.bbl .snum{min-width:22px;height:22px;background:var(--purple);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.68rem;font-weight:700;color:#fff;flex-shrink:0;margin-top:2px}
+.bbl .stxt{flex:1;font-size:.83rem;line-height:1.52}
+.bbl .fbox{background:rgba(124,92,252,.15);border:1px solid rgba(124,92,252,.3);border-radius:8px;padding:8px 12px;margin:7px 0;font-family:monospace;font-size:.84rem;color:var(--purple-light)}
+.bbl .hl{background:rgba(245,158,11,.1);border-left:3px solid var(--yellow);padding:6px 10px;border-radius:0 6px 6px 0;margin:6px 0;font-size:.83rem}
+.bbl .abox{background:rgba(34,197,94,.1);border:1px solid rgba(34,197,94,.28);border-radius:8px;padding:8px 12px;margin:7px 0;color:var(--green);font-weight:600}
+.bbl strong{color:var(--purple-light)}
+.bbl em{color:var(--yellow)}
+code.ic{background:rgba(124,92,252,.2);padding:1px 5px;border-radius:4px;font-family:monospace;font-size:.82em}
+.tind{display:flex;gap:5px;align-items:center;padding:10px 14px}
+.td{width:7px;height:7px;background:var(--purple);border-radius:50%;animation:typingB 1.2s infinite}
+.td:nth-child(2){animation-delay:.2s}
+.td:nth-child(3){animation-delay:.4s}
+.cam-wrap{display:none;margin-bottom:8px;border-radius:12px;overflow:hidden;border:1px solid rgba(124,92,252,.3)}
+.cam-wrap video{width:100%;display:block;max-height:155px;object-fit:cover}
+.cam-wrap canvas{display:none}
+.cam-ctrls{display:flex;gap:8px;padding:8px;background:rgba(0,0,0,.6)}
+.camb{flex:1;padding:7px;border:none;border-radius:8px;font-size:.8rem;font-weight:600;cursor:pointer}
+.camb.snap{background:var(--purple);color:#fff}
+.camb.stop{background:rgba(255,255,255,.1);color:var(--muted)}
+.ipreview{display:none;gap:8px;align-items:center;padding:8px 10px;background:var(--card2);border:1px solid rgba(124,92,252,.3);border-radius:10px;margin-bottom:8px}
+.ipreview.show{display:flex}
+.ipreview img{width:46px;height:46px;object-fit:cover;border-radius:6px}
+.ipreview span{flex:1;font-size:.78rem;color:var(--muted)}
+.ipreview button{background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem}
+.igen-row{display:none;gap:8px;align-items:center;background:var(--card2);border:1px solid rgba(124,92,252,.3);border-radius:12px;padding:8px 12px;margin-bottom:8px}
+.igen-row.show{display:flex}
+.igen-row input{flex:1;background:none;border:none;outline:none;color:var(--text);font-size:.85rem;font-family:'DM Sans',sans-serif}
+.igen-row input::placeholder{color:var(--muted)}
+.igen-go{padding:6px 13px;background:linear-gradient(135deg,#7c5cfc,#ec4899);border:none;border-radius:8px;color:#fff;font-size:.79rem;font-weight:700;cursor:pointer;white-space:nowrap}
+.vbar{display:none;align-items:center;justify-content:center;gap:3px;height:30px;margin-bottom:6px}
+.vbar.show{display:flex}
+.vb{width:4px;background:var(--red);border-radius:2px;animation:vwave .7s ease-in-out infinite alternate}
+.vb:nth-child(1){height:7px;animation-delay:0s}.vb:nth-child(2){height:15px;animation-delay:.1s}.vb:nth-child(3){height:23px;animation-delay:.2s}.vb:nth-child(4){height:17px;animation-delay:.3s}.vb:nth-child(5){height:11px;animation-delay:.4s}.vb:nth-child(6){height:21px;animation-delay:.5s}.vb:nth-child(7){height:9px;animation-delay:.6s}
+.inp-area{padding:10px 14px;border-top:1px solid rgba(255,255,255,.07);flex-shrink:0}
+.toolbar{display:flex;gap:6px;margin-bottom:8px;flex-wrap:wrap}
+.tbtn{display:flex;align-items:center;gap:5px;padding:6px 11px;background:var(--card2);border:1px solid var(--border);border-radius:10px;cursor:pointer;font-size:.75rem;color:var(--muted);transition:all .18s;white-space:nowrap;font-family:'DM Sans',sans-serif}
+.tbtn:hover{background:rgba(124,92,252,.18);color:var(--text);border-color:rgba(124,92,252,.4)}
+.tbtn.on{background:rgba(124,92,252,.2);color:var(--purple-light);border-color:rgba(124,92,252,.5)}
+.tbtn.rec{background:rgba(239,68,68,.15);color:var(--red);border-color:rgba(239,68,68,.4)}
+.tbtn svg{width:14px;height:14px}
+.inrow{display:flex;gap:8px;align-items:flex-end}
+.cta{flex:1;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:10px 14px;color:var(--text);font-size:.87rem;font-family:'DM Sans',sans-serif;resize:none;outline:none;transition:border-color .18s;max-height:90px;min-height:42px;line-height:1.4}
+.cta:focus{border-color:rgba(124,92,252,.5)}
+.cta::placeholder{color:var(--muted)}
+.sbtn{width:44px;height:44px;background:linear-gradient(135deg,#7c5cfc,#9b7fff);border:none;border-radius:12px;display:grid;place-items:center;cursor:pointer;flex-shrink:0;transition:opacity .18s,transform .18s}
+.sbtn:hover{opacity:.85;transform:scale(1.05)}
+.sbtn:disabled{opacity:.35;cursor:not-allowed;transform:none}
+.sbtn svg{width:18px;height:18px;color:#fff}
+.cwelcome{text-align:center;padding:18px 10px}
+.cwelcome .wi{font-size:2.8rem;margin-bottom:10px}
+.cwelcome h3{font-family:'Space Grotesk',sans-serif;font-size:1rem;margin-bottom:6px}
+.cwelcome p{color:var(--muted);font-size:.78rem;line-height:1.5}
+.qqs{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+.qq{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:9px 12px;font-size:.79rem;color:var(--text);cursor:pointer;text-align:left;transition:all .18s;font-family:'DM Sans',sans-serif}
+.qq:hover{background:rgba(124,92,252,.18);border-color:rgba(124,92,252,.4)}
+.svgcard{background:var(--card2);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-top:8px}
+.svgcard svg{width:100%;display:block}
+.svgcap{padding:7px 10px;font-size:.72rem;color:var(--muted)}
+
+/* status indicator */
+.api-status{display:flex;align-items:center;gap:5px;font-size:.68rem;padding:3px 8px;border-radius:99px;background:rgba(255,255,255,.05)}
+.api-status.ok{color:#22c55e}
+.api-status.missing{color:#f59e0b}
+.api-status-dot{width:6px;height:6px;border-radius:50%}
+.api-status.ok .api-status-dot{background:#22c55e}
+.api-status.missing .api-status-dot{background:#f59e0b}
+
+/* ═══════ CALENDAR ═══════ */
+.calendar-section-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:22px}
+.calendar-section-card h2{font-family:'Space Grotesk',sans-serif;font-size:1.1rem;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.cal-nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.cal-nav-title{font-family:'Space Grotesk',sans-serif;font-size:1.05rem;font-weight:700;color:var(--text)}
+.cal-nav-btn{background:var(--card2);border:1px solid var(--border);border-radius:8px;width:32px;height:32px;display:grid;place-items:center;cursor:pointer;color:var(--muted);font-size:1rem;transition:all .18s}
+.cal-nav-btn:hover{background:var(--purple-dim);color:var(--purple-light);border-color:rgba(124,92,252,.4)}
+.cal-legend{display:flex;gap:14px;margin-bottom:14px;flex-wrap:wrap}
+.cal-legend-item{display:flex;align-items:center;gap:6px;font-size:.72rem;color:var(--muted)}
+.cal-legend-dot{width:10px;height:10px;border-radius:3px}
+.cal-grid-header{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:6px}
+.cal-weekday{text-align:center;font-size:.71rem;font-weight:700;color:var(--muted);padding:4px 0;text-transform:uppercase;letter-spacing:.04em}
+.cal-weekday.mon-label{color:var(--yellow)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.cal-day{position:relative;aspect-ratio:1;border-radius:10px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:var(--card2);border:1px solid var(--border);transition:all .2s;font-size:.82rem;font-weight:500;overflow:hidden;min-height:48px}
+.cal-day:hover{border-color:rgba(124,92,252,.5);background:rgba(124,92,252,.1);transform:translateY(-1px)}
+.cal-day.empty{background:transparent;border:none;cursor:default;pointer-events:none}
+.cal-day.today{background:rgba(124,92,252,.25);border-color:var(--purple);color:#fff;font-weight:700}
+.cal-day.today .cal-day-num{color:var(--purple-light)}
+.cal-day.has-study{border-color:rgba(34,197,94,.35)}
+.cal-day.has-study::after{content:'';position:absolute;bottom:4px;width:5px;height:5px;border-radius:50%;background:var(--green)}
+.cal-day.is-monday{border-color:rgba(245,158,11,.4);background:rgba(245,158,11,.07)}
+.cal-day.is-monday .cal-day-num{color:var(--yellow)}
+.cal-day.activity-day{border-color:rgba(245,158,11,.6)!important;background:rgba(245,158,11,.12)!important}
+.cal-day-num{font-family:'Space Grotesk',sans-serif;font-size:.88rem;font-weight:600;line-height:1}
+.cal-day-emoji{font-size:.75rem;line-height:1;margin-top:2px}
+.cal-day.past{opacity:.45}
+.activity-banner{margin-top:14px;background:linear-gradient(135deg,rgba(245,158,11,.12),rgba(124,92,252,.1));border:1px solid rgba(245,158,11,.3);border-radius:12px;padding:14px 16px;display:none}
+.activity-banner.show{display:block}
+.activity-banner .ab-header{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.activity-banner .ab-icon{font-size:1.8rem}
+.activity-banner .ab-title{font-family:'Space Grotesk',sans-serif;font-size:.95rem;font-weight:700;color:var(--yellow)}
+.activity-banner .ab-subtitle{font-size:.75rem;color:var(--muted);margin-top:2px}
+.activity-banner .ab-desc{font-size:.82rem;color:var(--text);line-height:1.55;margin-bottom:10px}
+.activity-banner .ab-tags{display:flex;gap:6px;flex-wrap:wrap}
+.activity-tag{background:rgba(245,158,11,.15);border:1px solid rgba(245,158,11,.3);border-radius:99px;padding:3px 10px;font-size:.72rem;color:var(--yellow)}
+.cal-task-popup{margin-top:14px;background:var(--card2);border:1px solid var(--border);border-radius:12px;padding:14px 16px;display:none}
+.cal-task-popup.show{display:block}
+.cal-task-popup h4{font-family:'Space Grotesk',sans-serif;font-size:.9rem;margin-bottom:8px;color:var(--purple-light)}
+.cal-task-list{display:flex;flex-direction:column;gap:6px}
+.cal-task-item{display:flex;align-items:center;gap:8px;font-size:.8rem;padding:6px 10px;background:rgba(255,255,255,.03);border-radius:8px}
+.cal-task-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+
+/* ═══════ TEST MODAL ═══════ */
+#testModal{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;justify-content:center;align-items:center;z-index:2000}
+.test-inner{background:#161628;padding:24px;width:80%;max-width:700px;max-height:80vh;overflow:auto;border-radius:12px;color:var(--text);border:1px solid var(--border)}
+.test-inner h2{font-family:'Space Grotesk',sans-serif;margin-bottom:14px;color:var(--purple-light)}
+.test-inner h3,.test-inner h4{margin:12px 0 6px;color:var(--text)}
+.test-inner p{margin:6px 0;font-size:.87rem;line-height:1.6;color:var(--muted)}
+
+/* ═══════ GOALS SECTION ═══════ */
+.goals-check-list{display:flex;flex-direction:column;gap:8px;margin-top:12px}
+.goal-check-item{display:flex;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;font-size:.85rem;transition:border-color .18s}
+.goal-check-item:hover{border-color:rgba(124,92,252,.4)}
+.goal-check-item input[type=checkbox]{accent-color:var(--purple);width:16px;height:16px;cursor:pointer;flex-shrink:0}
+.goal-check-item label{cursor:pointer;flex:1}
+.goal-check-item.checked label{text-decoration:line-through;color:var(--muted)}
+</style>
+</head>
+<body>
+
+<!-- ── API KEY MODAL ── -->
+<div id="apiKeyModal">
+  <div class="api-modal-inner">
+    <h2>🔑 Connect FocusMate AI</h2>
+    <p>FocusMate uses the Anthropic Claude API to power your AI tutor. Enter your Anthropic API key below to enable the chatbot. Your key is stored only in your browser (localStorage) and never sent anywhere except directly to Anthropic.</p>
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." autocomplete="off"/>
+    <div class="api-btns">
+      <button class="save" onclick="saveApiKey()">✅ Save & Connect</button>
+      <button class="skip" onclick="skipApiKey()">Skip for now</button>
+    </div>
+    <div class="api-note">
+      Get your free API key at <a href="https://console.anthropic.com" target="_blank">console.anthropic.com</a>. 
+      Keys start with <code style="background:rgba(124,92,252,.2);padding:1px 5px;border-radius:4px;font-size:.78rem">sk-ant-</code>. 
+      Your key is saved locally and never shared.
+    </div>
+  </div>
+</div>
+
+<aside class="sidebar">
+  <div class="logo">
+    <div class="logo-icon">📚</div>
+    <div class="logo-text"><strong>Study<span>Planner</span></strong><br><small>Plan. Focus. Achieve.</small></div>
+  </div>
+  <a class="nav-item active" href="#" onclick="showSec('dashboard');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
+  <a class="nav-item" href="#" onclick="showSec('studyplan');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>Study Plan</a>
+  <a class="nav-item" href="#" onclick="showSec('dashboard');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/></svg>Focus Timer</a>
+  <a class="nav-item" href="#" onclick="showSec('tasks');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Tasks</a>
+  <a class="nav-item" href="#" onclick="showSec('calendar');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Calendar</a>
+  <a class="nav-item" href="#" onclick="showSec('analytics');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>Analytics</a>
+  <a class="nav-item" href="#" onclick="showSec('goalspage');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5"/></svg>Goals</a>
+  <a class="nav-item" href="#" onclick="showSec('notes');return false;">📒 Notes</a>
+  <a class="nav-item" href="#" onclick="showSec('resources');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 01-2 2H4a2 2 0 01-2-2V5a2 2 0 012-2h5l2 3h9a2 2 0 012 2z"/></svg>Resources</a>
+  <a class="nav-item" href="#" onclick="showSec('dashboard');return false;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/></svg>Settings</a>
+  <div class="sidebar-spacer"></div>
+  <div class="motivation-card"><div class="tag">Daily Motivation</div><p>"Discipline today leads to freedom tomorrow."</p><div class="author">– Unknown</div></div>
+  <div class="logout"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16,17 21,12 16,7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>Log out</div>
+</aside>
+
+<div class="main">
+  <div class="topbar">
+    <div class="greeting"><h1 id="greeting-text">Good evening, Ananya! 👋</h1><p>Stay consistent, progress takes time.</p></div>
+    <div class="date-pill"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#7c5cfc" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><div><div class="d1" id="current-date">—</div><div class="d2" id="current-day">—</div></div></div>
+    <div class="search-bar"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search anything...</div>
+    <div class="notif-btn"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg><div class="badge">3</div></div>
+    <div class="avatar">👩</div>
+  </div>
+
+  <div class="content">
+
+    <!-- ── NOTES ── -->
+    <div id="notes-section" class="section-card" style="display:none;">
+      <h2>📒 Study Notes</h2>
+      <select id="subj-notes" onchange="loadCh()"><option value="">Select Subject</option></select>
+      <select id="ch-notes" onchange="loadNotes()"><option value="">Select Chapter</option></select>
+      <textarea id="note-text" rows="4" placeholder="Your notes will appear here…" style="margin-top:8px"></textarea>
+      <ul id="notes-list"></ul>
+    </div>
+
+    <!-- ── RESOURCES ── -->
+    <div id="resources-section" class="section-card" style="display:none;">
+      <h2>📁 Resources</h2>
+      <input type="text" id="res-title" placeholder="Title"/>
+      <input type="text" id="res-link" placeholder="Link (https://...)"/>
+      <button onclick="addRes()">➕ Add Resource</button>
+      <ul id="res-list"></ul>
+    </div>
+
+    <!-- ── STUDY PLAN PAGE ── -->
+    <div id="studyplan-section" class="section-card" style="display:none;">
+      <h2>📋 Weekly Study Plan</h2>
+      <div id="studyPlanContainer"></div>
+    </div>
+
+    <!-- ── TASKS PAGE ── -->
+    <div id="tasks-section" class="section-card" style="display:none;">
+      <h2>✅ My Goals & Tasks</h2>
+      <div id="goalsContainer" class="goals-check-list"></div>
+    </div>
+
+    <!-- ── ANALYTICS PAGE ── -->
+    <div id="analytics-section" class="section-card" style="display:none;">
+      <h2>📊 Analytics</h2>
+      <p style="color:var(--muted);font-size:.87rem">Your weekly progress is shown on the dashboard. Here's your summary:</p>
+      <div style="margin-top:16px;display:grid;grid-template-columns:1fr 1fr;gap:14px">
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px"><div style="color:var(--muted);font-size:.75rem">Total Study Hours (Month)</div><div style="font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:700;margin-top:4px">92h 15m</div></div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px"><div style="color:var(--muted);font-size:.75rem">Average Focus Score</div><div style="font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:700;margin-top:4px">81/100</div></div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px"><div style="color:var(--muted);font-size:.75rem">Best Subject</div><div style="font-family:'Space Grotesk',sans-serif;font-size:1.3rem;font-weight:700;margin-top:4px">📐 Math</div></div>
+        <div style="background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px"><div style="color:var(--muted);font-size:.75rem">Tasks Completed (Month)</div><div style="font-family:'Space Grotesk',sans-serif;font-size:1.8rem;font-weight:700;margin-top:4px">138/180</div></div>
+      </div>
+    </div>
+
+    <!-- ── GOALS PAGE ── -->
+    <div id="goalspage-section" class="section-card" style="display:none;">
+      <h2>🏆 Goals</h2>
+      <div id="goalsPageContainer" class="goals-check-list"></div>
+    </div>
+
+    <!-- ── CALENDAR ── -->
+    <div id="calendar-section" class="calendar-section-card" style="display:none;">
+      <h2>📅 Study Calendar</h2>
+      <div class="cal-nav">
+        <button class="cal-nav-btn" onclick="calPrev()">◀</button>
+        <div class="cal-nav-title" id="cal-month-title"></div>
+        <button class="cal-nav-btn" onclick="calNext()">▶</button>
+      </div>
+      <div class="cal-legend">
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--purple)"></div> Today</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--yellow)"></div> Monday Activity</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:var(--green)"></div> Study Session</div>
+        <div class="cal-legend-item"><div class="cal-legend-dot" style="background:rgba(255,255,255,.15)"></div> No tasks</div>
+      </div>
+      <div class="cal-grid-header">
+        <div class="cal-weekday mon-label">Mon</div>
+        <div class="cal-weekday">Tue</div>
+        <div class="cal-weekday">Wed</div>
+        <div class="cal-weekday">Thu</div>
+        <div class="cal-weekday">Fri</div>
+        <div class="cal-weekday">Sat</div>
+        <div class="cal-weekday">Sun</div>
+      </div>
+      <div class="cal-grid" id="cal-grid"></div>
+      <div class="activity-banner" id="activity-banner">
+        <div class="ab-header">
+          <div class="ab-icon" id="ab-icon">🎯</div>
+          <div><div class="ab-title" id="ab-title">Monday Activity</div><div class="ab-subtitle" id="ab-subtitle"></div></div>
+        </div>
+        <div class="ab-desc" id="ab-desc"></div>
+        <div class="ab-tags" id="ab-tags"></div>
+      </div>
+      <div class="cal-task-popup" id="cal-task-popup">
+        <h4 id="popup-date-title">📋 Tasks for this day</h4>
+        <div class="cal-task-list" id="popup-task-list"></div>
+      </div>
+    </div>
+
+    <!-- ── DASHBOARD ── -->
+    <div id="dashboard-section">
+      <div class="stat-row">
+        <div class="stat-card"><div class="sc-head"><div class="sc-icon" style="background:rgba(124,92,252,.18)">🕐</div><div class="sc-label">Study Time Today</div></div><div class="sc-value">4h 25m</div><div class="sc-sub">Goal: 6h 00m</div><div class="progress-bar"><div class="progress-fill" style="width:71%;background:var(--purple)"></div></div><div class="sc-pct">71%</div></div>
+        <div class="stat-card"><div class="sc-head"><div class="sc-icon" style="background:rgba(34,197,94,.15)">✅</div><div class="sc-label">Tasks Completed</div></div><div class="sc-value">7 <span style="font-size:1rem;color:var(--muted)">/12</span></div><div class="sc-sub">58% completed</div><div class="progress-bar"><div class="progress-fill" style="width:58%;background:var(--green)"></div></div><div class="sc-pct">58%</div></div>
+        <div class="stat-card"><div class="sc-head"><div class="sc-icon" style="background:rgba(245,158,11,.15)">⚡</div><div class="sc-label">Focus Score</div></div><div class="sc-value">82 <span style="font-size:1rem;color:var(--muted)">/100</span></div><div class="sc-sub">Great focus! 🔥</div><div class="progress-bar"><div class="progress-fill" style="width:82%;background:var(--yellow)"></div></div><div class="sc-pct">82%</div></div>
+        <div class="stat-card"><div class="sc-head"><div class="sc-icon" style="background:rgba(239,68,68,.12)">⏱️</div><div class="sc-label">Procrastination Time</div></div><div class="sc-value">1h 10m</div><div class="sc-sub">Keep it low! 🎯</div><div class="progress-bar"><div class="progress-fill" style="width:23%;background:var(--red)"></div></div><div class="sc-pct">23%</div></div>
+      </div>
+      <div class="mid-row">
+        <div class="chart-card">
+          <div class="card-head"><div><h3>Study Progress</h3><p>Your study time vs planned time</p></div><div class="pill-btn">This Week</div></div>
+          <div class="legend"><div class="legend-item"><div class="legend-dot" style="background:var(--purple);width:18px"></div>Planned</div><div class="legend-item"><div class="legend-dot" style="background:var(--purple-light);width:18px"></div>Actual</div></div>
+          <div class="chart-wrap">
+            <svg viewBox="0 0 560 220" xmlns="http://www.w3.org/2000/svg" style="overflow:visible">
+              <defs><linearGradient id="gfill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#7c5cfc" stop-opacity="0.25"/><stop offset="100%" stop-color="#7c5cfc" stop-opacity="0"/></linearGradient></defs>
+              <text x="0" y="14" fill="#8888aa" font-size="11">8h</text><text x="0" y="68" fill="#8888aa" font-size="11">6h</text><text x="0" y="122" fill="#8888aa" font-size="11">4h</text><text x="0" y="176" fill="#8888aa" font-size="11">2h</text>
+              <line x1="28" y1="10" x2="555" y2="10" stroke="#ffffff10" stroke-width="1"/><line x1="28" y1="64" x2="555" y2="64" stroke="#ffffff10" stroke-width="1"/><line x1="28" y1="118" x2="555" y2="118" stroke="#ffffff10" stroke-width="1"/><line x1="28" y1="172" x2="555" y2="172" stroke="#ffffff10" stroke-width="1"/>
+              <text x="50" y="220" fill="#8888aa" font-size="11" text-anchor="middle">Mon</text><text x="130" y="220" fill="#8888aa" font-size="11" text-anchor="middle">Tue</text><text x="210" y="220" fill="#8888aa" font-size="11" text-anchor="middle">Wed</text><text x="290" y="220" fill="#8888aa" font-size="11" text-anchor="middle">Thu</text><text x="370" y="220" fill="#8888aa" font-size="11" text-anchor="middle">Fri</text><text x="450" y="220" fill="#8888aa" font-size="11" text-anchor="middle">Sat</text><text x="530" y="220" fill="#8888aa" font-size="11" text-anchor="middle">Sun</text>
+              <polyline points="50,155 130,128 210,100 290,100 370,72 450,80 530,64" fill="none" stroke="#7c5cfc" stroke-width="2" stroke-dasharray="5,4" opacity=".7"/>
+              <polygon points="50,172 130,155 210,118 290,100 370,82 450,46 530,10 530,208 50,208" fill="url(#gfill)"/>
+              <polyline points="50,172 130,155 210,118 290,100 370,82 450,46 530,10" fill="none" stroke="#9b7fff" stroke-width="2.5"/>
+              <circle cx="50" cy="172" r="4" fill="#9b7fff" stroke="#161628" stroke-width="2"/><circle cx="130" cy="155" r="4" fill="#9b7fff" stroke="#161628" stroke-width="2"/><circle cx="210" cy="118" r="4" fill="#9b7fff" stroke="#161628" stroke-width="2"/><circle cx="290" cy="100" r="4" fill="#9b7fff" stroke="#161628" stroke-width="2"/><circle cx="370" cy="82" r="4" fill="#9b7fff" stroke="#161628" stroke-width="2"/><circle cx="450" cy="46" r="4" fill="#9b7fff" stroke="#161628" stroke-width="2"/><circle cx="530" cy="10" r="4" fill="#9b7fff" stroke="#161628" stroke-width="2"/>
+            </svg>
+          </div>
+        </div>
+        <div class="plan-card">
+          <div class="card-head"><div><h3>📋 Today's Plan</h3></div><div class="view-link" onclick="showSec('calendar')">View Calendar</div></div>
+          <div id="plan-container"></div>
+        </div>
+      </div>
+      <div class="bottom-row">
+        <div class="timer-card">
+          <div class="card-head"><div><h3>⏱ Focus Timer</h3></div></div>
+          <div class="timer-ring">
+            <svg width="130" height="130" viewBox="0 0 130 130"><circle cx="65" cy="65" r="56" fill="none" stroke="rgba(255,255,255,.07)" stroke-width="8"/><circle id="timer-arc" cx="65" cy="65" r="56" fill="none" stroke="#7c5cfc" stroke-width="8" stroke-dasharray="351.86" stroke-dashoffset="87.97" stroke-linecap="round"/></svg>
+            <div class="timer-text pulsing" id="timer-display"><div class="t-val" id="timer-value">25:00</div><div class="t-label">Focus Time</div></div>
+          </div>
+          <div class="timer-sub" id="pomodoro-label">Pomodoro 1/4</div>
+          <div class="timer-btns"><button class="btn-primary" id="start-btn" onclick="toggleTimer()">▶ Start Focus</button><div class="btn-icon" onclick="resetTimer()">🔄</div></div>
+        </div>
+        <div class="proc-card">
+          <div class="card-head" style="margin-bottom:12px"><div><h3>😬 Procrastination Insights</h3></div></div>
+          <div class="donut-row">
+            <div class="donut-wrap">
+              <svg width="110" height="110" viewBox="0 0 110 110"><circle cx="55" cy="55" r="40" fill="none" stroke="#1c1c35" stroke-width="16"/><circle cx="55" cy="55" r="40" fill="none" stroke="#ef4444" stroke-width="16" stroke-dasharray="150.80 251.33" stroke-dashoffset="0" transform="rotate(-90 55 55)"/><circle cx="55" cy="55" r="40" fill="none" stroke="#f59e0b" stroke-width="16" stroke-dasharray="85.45 251.33" stroke-dashoffset="-150.80" transform="rotate(-90 55 55)"/><circle cx="55" cy="55" r="40" fill="none" stroke="#a855f7" stroke-width="16" stroke-dasharray="42.73 251.33" stroke-dashoffset="-236.25" transform="rotate(-90 55 55)"/><circle cx="55" cy="55" r="40" fill="none" stroke="#22c55e" stroke-width="16" stroke-dasharray="21.36 251.33" stroke-dashoffset="-279.0" transform="rotate(-90 55 55)"/></svg>
+              <div class="donut-center"><strong>1h 10m</strong><small>Total</small></div>
+            </div>
+            <div class="proc-legend">
+              <div class="proc-item"><div class="proc-dot" style="background:#ef4444"></div><span class="proc-name">Social Media</span><span class="proc-time">35m</span></div>
+              <div class="proc-item"><div class="proc-dot" style="background:#f59e0b"></div><span class="proc-name">YouTube</span><span class="proc-time">20m</span></div>
+              <div class="proc-item"><div class="proc-dot" style="background:#a855f7"></div><span class="proc-name">Other Websites</span><span class="proc-time">10m</span></div>
+              <div class="proc-item"><div class="proc-dot" style="background:#22c55e"></div><span class="proc-name">Entertainment</span><span class="proc-time">5m</span></div>
+            </div>
+          </div>
+          <div class="tip-bar">💡 Tip: Most procrastination: <span>Social Media</span>. Try Focus Mode!</div>
+        </div>
+        <div class="weekly-card">
+          <div class="card-head"><div><h3>📊 Weekly Overview</h3></div><div class="pill-btn">This Week</div></div>
+          <div class="weekly-stats"><div class="wstat"><div class="ws-label">Total Study Time</div><div class="ws-val">23h 45m</div><div class="ws-change">↑ 12% from last week</div></div><div class="wstat"><div class="ws-label">Focus Score Avg.</div><div class="ws-val">78<span style="font-size:.8rem;color:var(--muted)">/100</span></div><div class="ws-change">↑ 8% from last week</div></div></div>
+          <div class="bar-chart"><div class="bar-col"><div class="bar-fill" style="height:45%"></div><div class="bar-label">Mon</div></div><div class="bar-col"><div class="bar-fill" style="height:55%"></div><div class="bar-label">Tue</div></div><div class="bar-col"><div class="bar-fill" style="height:70%"></div><div class="bar-label">Wed</div></div><div class="bar-col"><div class="bar-fill" style="height:80%"></div><div class="bar-label">Thu</div></div><div class="bar-col"><div class="bar-fill today" style="height:90%"></div><div class="bar-label">Fri</div></div><div class="bar-col"><div class="bar-fill" style="height:60%"></div><div class="bar-label">Sat</div></div><div class="bar-col"><div class="bar-fill" style="height:35%"></div><div class="bar-label">Sun</div></div></div>
+        </div>
+      </div>
+      <div class="goals-row">
+        <h3>🏆 Goals &amp; Streaks</h3>
+        <div class="goal-item"><div class="goal-icon">🔥</div><div class="goal-info"><div class="gi-name">Current Streak</div><div class="gi-prog" style="font-size:.9rem;font-weight:700;color:var(--yellow)">7 Days</div><div class="gi-prog">Keep it up!</div></div></div>
+        <div class="goal-item" style="flex:2"><div class="goal-icon">🎯</div><div class="goal-info" style="flex-shrink:0"><div class="gi-name">Study 30 Hours</div><div class="gi-prog">23/30 hours</div></div><div class="goal-bar" style="flex:1;padding-left:10px"><div class="progress-bar" style="height:5px;margin-top:0"><div class="progress-fill" style="width:77%;background:var(--yellow)"></div></div></div></div>
+        <div class="goal-item" style="flex:2"><div class="goal-icon">📝</div><div class="goal-info" style="flex-shrink:0"><div class="gi-name">Complete 50 Tasks</div><div class="gi-prog">38/50 tasks</div></div><div class="goal-bar" style="flex:1;padding-left:10px"><div class="progress-bar" style="height:5px;margin-top:0"><div class="progress-fill" style="width:76%;background:var(--purple)"></div></div></div></div>
+        <div class="goal-item" style="flex:2"><div class="goal-icon">🏅</div><div class="goal-info" style="flex-shrink:0"><div class="gi-name">Focus Master</div><div class="gi-prog">78/90</div></div><div class="goal-bar" style="flex:1;padding-left:10px"><div class="progress-bar" style="height:5px;margin-top:0"><div class="progress-fill" style="width:87%;background:var(--green)"></div></div></div></div>
+        <div class="achievement-badge"><div class="badge-icon">🌟</div><div class="badge-text"><div class="bt1">You're doing amazing!</div><div class="bt2">Consistency is the key.</div></div></div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- FOCUSMATE FAB -->
+<button class="chat-fab" id="chatFab" onclick="toggleChat()">
+  <div class="fab-ring"></div>
+  <span class="fab-icon">🎯</span>
+</button>
+
+<div class="chat-win" id="chatWin">
+  <div class="chat-hdr">
+    <div class="bot-av">🎯<div class="ondot"></div></div>
+    <div class="hdr-info"><h4>FocusMate AI Tutor</h4><p>● Online — All 50 Subjects · Step-by-Step</p></div>
+    <div class="hdr-acts">
+      <div id="apiStatusBadge" class="api-status missing" title="Click 🔑 to add API key"><div class="api-status-dot"></div><span id="apiStatusText">No Key</span></div>
+      <div class="hbtn key-btn" onclick="showApiModal()" title="Update API Key">🔑 Key</div>
+      <div class="hbtn" onclick="clearChat()" title="Clear">🗑</div>
+      <div class="hbtn" onclick="toggleChat()" title="Close">✕</div>
+    </div>
+  </div>
+  <div class="subj-bar">
+    <div class="subj-bar-lbl">Pick a subject for focused help</div>
+    <div class="chips-row" id="chips"></div>
+  </div>
+  <div class="msgs" id="msgs">
+    <div class="cwelcome" id="cwelcome">
+      <div class="wi">🎯</div>
+      <h3>Hi Ananya! I'm FocusMate, your AI Tutor</h3>
+      <p>Ask me <strong>any question</strong> from all 50 subjects. I'll explain everything <strong>step by step</strong> in simple language.</p>
+      <div class="qqs">
+        <button class="qq" onclick="sendQ('Explain Newton\'s 3 Laws of Motion step by step with real-life examples')">⚡ Newton's Laws — step by step</button>
+        <button class="qq" onclick="sendQ('Differentiate f(x) = x³ + 5x² - 3x + 7 with respect to x. Show every step clearly.')">📐 Differentiate x³ + 5x² – 3x + 7</button>
+        <button class="qq" onclick="sendQ('Explain photosynthesis step by step in very simple language for a student')">🌿 Photosynthesis — simple steps</button>
+        <button class="qq" onclick="sendQ('What is the difference between mitosis and meiosis? Explain step by step with key points')">🧬 Mitosis vs Meiosis comparison</button>
+        <button class="qq" onclick="genImg('Draw a fully labeled diagram of the water cycle')">🎨 Generate: Water Cycle diagram</button>
+      </div>
+    </div>
+  </div>
+  <div class="inp-area">
+    <div class="vbar" id="vbar"><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div><div class="vb"></div></div>
+    <div class="ipreview" id="ipreview"><img id="ithumb" src="" alt=""/><span id="ilabel">Photo ready — ask a question or just send</span><button onclick="clearImg()">✕</button></div>
+    <div class="igen-row" id="igenrow"><input type="text" id="igeninput" placeholder="Describe a diagram to create…"/><button class="igen-go" onclick="genImg()">✨ Create</button></div>
+    <div class="cam-wrap" id="camwrap"><video id="camvid" autoplay playsinline></video><canvas id="camcanvas"></canvas><div class="cam-ctrls"><button class="camb snap" onclick="snapPhoto()">📸 Capture</button><button class="camb stop" onclick="stopCam()">✕ Cancel</button></div></div>
+    <div class="toolbar">
+      <div class="tbtn" id="micBtn" onclick="toggleMic()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 1a3 3 0 00-3 3v8a3 3 0 006 0V4a3 3 0 00-3-3z"/><path d="M19 10v2a7 7 0 01-14 0v-2M12 19v4M8 23h8"/></svg><span id="micLbl">🎤 Microphone</span></div>
+      <div class="tbtn" id="camBtn" onclick="toggleCam()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>📷 Camera</div>
+      <div class="tbtn" id="igenBtn" onclick="toggleIgen()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21,15 16,10 5,21"/></svg>🎨 Create Image</div>
+      <div class="tbtn" id="ttsBtn" onclick="toggleTTS()">🔊 <span id="ttsLbl">Read Aloud</span></div>
+    </div>
+    <div class="inrow">
+      <textarea class="cta" id="cta" rows="1" placeholder="Type any question from any of the 50 subjects… (Enter to send)"
+        onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendMsg();}"
+        oninput="autoR(this)"></textarea>
+      <button class="sbtn" id="sbtn" onclick="sendMsg()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- TEST MODAL -->
+<div id="testModal">
+  <div class="test-inner">
+    <h2 id="testTitle">Test Paper</h2>
+    <div id="testContent"></div>
+    <button onclick="closeTest()" style="margin-top:14px;padding:8px 20px;background:var(--purple);border:none;border-radius:8px;color:#fff;cursor:pointer;font-size:.87rem">Close</button>
+  </div>
+</div>
+
+<script>
+/* ══════════════════════════
+   API KEY MANAGEMENT
+══════════════════════════ */
+const API_KEY_STORAGE = 'focusmate_api_key';
+
+function getApiKey() {
+  return localStorage.getItem(API_KEY_STORAGE) || '';
+}
+
+function saveApiKey() {
+  const key = document.getElementById('apiKeyInput').value.trim();
+  if (!key) { alert('Please enter a valid API key.'); return; }
+  if (!key.startsWith('sk-ant-') && !key.startsWith('sk-')) {
+    alert('⚠️ This doesn\'t look like a valid Anthropic API key. Keys typically start with "sk-ant-".');
+    return;
+  }
+  localStorage.setItem(API_KEY_STORAGE, key);
+  document.getElementById('apiKeyModal').style.display = 'none';
+  updateApiStatus();
+}
+
+function skipApiKey() {
+  document.getElementById('apiKeyModal').style.display = 'none';
+  updateApiStatus();
+}
+
+function showApiModal() {
+  const existing = getApiKey();
+  if (existing) {
+    document.getElementById('apiKeyInput').value = existing;
+  }
+  document.getElementById('apiKeyModal').style.display = 'flex';
+}
+
+function updateApiStatus() {
+  const key = getApiKey();
+  const badge = document.getElementById('apiStatusBadge');
+  const text = document.getElementById('apiStatusText');
+  if (key) {
+    badge.className = 'api-status ok';
+    text.textContent = '✓ Connected';
+  } else {
+    badge.className = 'api-status missing';
+    text.textContent = 'No Key';
+  }
+}
+
+/* ══════════════════════════
+   DATA
+══════════════════════════ */
+const SUBJECTS = ["Math","Physics","Chemistry","Biology","English","History","Geography","Computer","Economics","Civics","Accounts","Business Studies","Political Science","Sociology","Psychology","Philosophy","Statistics","Environmental Science","Hindi","Sanskrit","French","German","Spanish","Art","Music","Physical Education","Engineering Graphics","Electronics","Mechanical","Civil","AI","Data Science","Machine Learning","Cyber Security","Web Development","App Development","Cloud Computing","Blockchain","Astronomy","Robotics","Nanotechnology","Genetics","Microbiology","Law","Journalism","Design","Animation","Film Studies","Entrepreneurship","Ethics"];
+
+const SEMOJI = {"Math":"📐","Physics":"⚡","Chemistry":"🧪","Biology":"🌿","English":"📖","History":"🏛","Geography":"🌍","Computer":"💻","Economics":"📊","Civics":"⚖️","Accounts":"🧾","Business Studies":"💼","Political Science":"🗳","Sociology":"👥","Psychology":"🧠","Philosophy":"💭","Statistics":"📈","Environmental Science":"🌱","Hindi":"🔤","Sanskrit":"📜","French":"🇫🇷","German":"🇩🇪","Spanish":"🇪🇸","Art":"🎨","Music":"🎵","Physical Education":"🏃","Engineering Graphics":"📏","Electronics":"🔌","Mechanical":"⚙️","Civil":"🏗","AI":"🤖","Data Science":"📊","Machine Learning":"🧬","Cyber Security":"🔐","Web Development":"🌐","App Development":"📱","Cloud Computing":"☁️","Blockchain":"🔗","Astronomy":"🔭","Robotics":"🦾","Nanotechnology":"🔬","Genetics":"🧬","Microbiology":"🦠","Law":"⚖️","Journalism":"📰","Design":"✏️","Animation":"🎬","Film Studies":"🎥","Entrepreneurship":"🚀","Ethics":"🤝"};
+
+const weeklyPlan = [
+  {day:"Monday",    subject:"Maths",    task:"Chapter 1 - Algebra"},
+  {day:"Tuesday",   subject:"Science",  task:"Chapter 2 - Physics"},
+  {day:"Wednesday", subject:"English",  task:"Grammar Practice"},
+  {day:"Thursday",  subject:"History",  task:"Chapter 3 - Ancient India"},
+  {day:"Friday",    subject:"Geography",task:"Maps & Climate"},
+  {day:"Saturday",  subject:"Computer", task:"HTML + JS Practice"},
+  {day:"Sunday",    subject:"Revision", task:"Weekly Revision + Test"}
+];
+
+const goalsList = [
+  "Complete Maths Chapter","Complete Science Chapter","Complete English Chapter",
+  "Complete History Chapter","Complete Geography Chapter","Complete Computer Chapter",
+  "Revise all subjects","Practice 50 questions","Take 1 mock test","Improve weak subject"
+];
+
+const MONDAY_ACTIVITIES = [
+  {subject:"Physics",icon:"⚡",emoji:"⚡",title:"Gravity Drop Challenge",subtitle:"Physics • Experiment & Predict",desc:"Drop objects of different masses (coin, pen, eraser) from the same height simultaneously. Predict which lands first, then test it! Discover how Galileo disproved Aristotle's theory of gravity. Record your results and explain using Newton's Law of Gravitation.",tags:["🔬 Hands-on","⏱ 20 min","🎯 Observation","📝 Report"]},
+  {subject:"Math",icon:"📐",emoji:"📐",title:"Pi Estimation with Toothpicks",subtitle:"Math • Buffon's Needle Experiment",desc:"Drop 50 toothpicks on lined paper and count how many cross a line. Use the formula π ≈ 2L·N / (d·C) to estimate Pi! This 1777 experiment by Buffon is one of the most magical moments in probability theory.",tags:["🎲 Probability","📏 Measurement","🤯 Mind-blowing","⏱ 30 min"]},
+  {subject:"Chemistry",icon:"🧪",emoji:"🧪",title:"Kitchen Chemistry: pH Rainbow",subtitle:"Chemistry • Acid-Base Indicators",desc:"Use red cabbage juice as a natural pH indicator! Test lemon juice, baking soda, vinegar, milk, and water. Watch them turn pink, purple, green, and yellow. Rank all solutions on the pH scale and explain what you observe.",tags:["🌈 Colourful","🍋 Kitchen science","⏱ 25 min","📊 Data collection"]},
+  {subject:"Biology",icon:"🌿",emoji:"🌿",title:"Heartbeat & Exercise Lab",subtitle:"Biology • Cardiovascular System",desc:"Measure your resting heart rate for 60 seconds. Do 30 jumping jacks, then measure again. Rest for 2 minutes and measure a third time. Plot a graph of your recovery curve and explain the role of the heart, lungs, and oxygen in exercise.",tags:["💓 Body science","📈 Graph work","⏱ 20 min","🏃 Active"]},
+  {subject:"Astronomy",icon:"🔭",emoji:"🔭",title:"Moon Phase Tracker",subtitle:"Astronomy • Lunar Observation",desc:"Look at the moon tonight and sketch its shape. Over the next 4 Mondays, record its shape again. Predict when the next full moon will be using your data and compare your calculated lunar cycle to the accepted 29.5 days.",tags:["🌙 Observation","📅 4-week project","🎨 Sketching","🔢 Calculation"]},
+  {subject:"Geography",icon:"🌍",emoji:"🌍",title:"Blind Map Memory Challenge",subtitle:"Geography • Spatial Memory",desc:"Study a blank map of India for 3 minutes. Then fill in as many states, capitals, and rivers as you can from memory. Score yourself: 1 pt per correct state, 2 pts per capital, 3 pts per river. Try to beat your score next Monday!",tags:["🗺 Mapping","🧠 Memory","🏆 Self-scoring","⏱ 15 min"]},
+  {subject:"Computer",icon:"💻",emoji:"💻",title:"Binary Number Art",subtitle:"Computer Science • Binary Encoding",desc:"Convert your name into binary (A=01000001, B=01000010…). Write each binary digit as a black or white square on grid paper to create pixel art of your name! Then decode: 01001000 01001001 = ?",tags:["🔢 Binary","🎨 Creative","🔐 Encoding","⏱ 20 min"]},
+  {subject:"History",icon:"🏛",emoji:"🏛",title:"Ancient Civilizations Debate",subtitle:"History • Critical Thinking",desc:"Choose one: Indus Valley, Egyptian, Roman, or Mesopotamian civilization. Prepare 5 reasons why YOUR chosen civilization was the most advanced. Argue your case focusing on architecture, governance, science, and culture.",tags:["🎤 Speaking","📚 Research","🏆 Debate","⏱ 25 min"]},
+  {subject:"English",icon:"📖",emoji:"📖",title:"60-Second Story Slam",subtitle:"English • Creative Writing Sprint",desc:"Pick a random object near you. You have exactly 60 seconds to write the opening paragraph of a story where that object is the most important thing in the world. Challenge: include at least one metaphor, one simile, and one personification!",tags:["✍️ Creative writing","⏱ Timed challenge","📖 Literary devices","🎭 Storytelling"]},
+  {subject:"Psychology",icon:"🧠",emoji:"🧠",title:"Stroop Effect Experiment",subtitle:"Psychology • Cognitive Interference",desc:"Write colour names in WRONG colours (e.g. write RED in blue ink). Ask 5 friends to name the ink colour as fast as possible. Time them. Compare this to naming the ink colour when the word matches. Plot results and explain the Stroop Effect.",tags:["🧪 Experiment","👥 Social","📊 Data","🧩 Cognition"]},
+  {subject:"Art",icon:"🎨",emoji:"🎨",title:"Blind Contour Portrait",subtitle:"Art • Drawing Technique",desc:"Place your pen on paper and draw someone's face WITHOUT looking at your paper and without lifting your pen. Keep your eyes only on the subject! Do this 3 times and compare results. This technique is used by professional artists worldwide.",tags:["✏️ Drawing","👁 Observation","🎭 Technique","⏱ 15 min"]},
+  {subject:"Math",icon:"📐",emoji:"📐",title:"Fibonacci in Nature Hunt",subtitle:"Math • Patterns & Sequences",desc:"Find the Fibonacci sequence (1,1,2,3,5,8,13,21…) hidden in nature around your home! Count petals on flowers, spiral seeds in a sunflower, sections of a pineapple, or leaves on a stem. Calculate the ratio between consecutive numbers — discover the Golden Ratio!",tags:["🌻 Nature","🔢 Sequences","📸 Documentation","🌀 Golden Ratio"]}
+];
+
+const STUDY_DATA = {};
+(function(){
+  const now = new Date();
+  const y = now.getFullYear(), m = now.getMonth();
+  const sessions = [
+    {s:"Math",t:"9:00 AM",c:"#7c5cfc"},{s:"Physics",t:"11:00 AM",c:"#22c55e"},
+    {s:"Chemistry",t:"2:00 PM",c:"#f59e0b"},{s:"Biology",t:"4:00 PM",c:"#ec4899"},
+    {s:"English",t:"7:00 PM",c:"#06b6d4"},{s:"History",t:"10:00 AM",c:"#a855f7"},
+    {s:"Computer",t:"3:00 PM",c:"#ef4444"},{s:"Geography",t:"5:00 PM",c:"#84cc16"},
+  ];
+  for(let d=1; d<=28; d++){
+    if(d%3===0) continue;
+    const key = `${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const count = 1 + Math.floor(Math.random()*3);
+    const picked = [...sessions].sort(()=>Math.random()-.5).slice(0,count);
+    STUDY_DATA[key] = picked.map(x=>({subject:x.s, time:x.t, color:x.c}));
+  }
+})();
+
+/* ══════════════════════════
+   INIT
+══════════════════════════ */
+window.addEventListener('DOMContentLoaded', function() {
+  // Check if API key exists; if not show modal
+  const existingKey = getApiKey();
+  if (!existingKey) {
+    document.getElementById('apiKeyModal').style.display = 'flex';
+  } else {
+    document.getElementById('apiKeyModal').style.display = 'none';
+  }
+  updateApiStatus();
+
+  // Date/time
+  const n = new Date();
+  const days = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const mo = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  document.getElementById('current-date').textContent = mo[n.getMonth()]+' '+n.getDate()+', '+n.getFullYear();
+  document.getElementById('current-day').textContent = days[n.getDay()];
+  const hr = n.getHours();
+  const greet = hr < 12 ? 'Good morning' : hr < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('greeting-text').textContent = greet + ', Ananya! 👋';
+
+  document.querySelectorAll('.nav-item').forEach(i => i.addEventListener('click', function(){
+    document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
+    this.classList.add('active');
+  }));
+
+  const sel = document.getElementById('subj-notes');
+  SUBJECTS.forEach(s => {
+    const opt = document.createElement('option');
+    opt.value = s; opt.textContent = s;
+    sel.appendChild(opt);
+  });
+
+  buildChips();
+  loadStudyPlan();
+  loadGoals();
+  generateStudyPlans();
+  renderRes();
+});
+
+/* ══════════════════════════
+   NAVIGATION
+══════════════════════════ */
+function showSec(s) {
+  const all = ['dashboard','notes','resources','calendar','studyplan','tasks','analytics','goalspage'];
+  all.forEach(id => {
+    const el = document.getElementById(id+'-section');
+    if(el) el.style.display = 'none';
+  });
+  const target = document.getElementById(s+'-section');
+  if(target) target.style.display = 'block';
+  if(s === 'calendar') renderCalendar();
+}
+
+/* ══════════════════════════
+   NOTES
+══════════════════════════ */
+function loadCh(){
+  const d = document.getElementById('ch-notes');
+  d.innerHTML = '<option value="">Select Chapter</option>';
+  for(let i=1; i<=10; i++) {
+    const opt = document.createElement('option');
+    opt.value = 'ch'+i; opt.textContent = 'Chapter '+i;
+    d.appendChild(opt);
+  }
+}
+function loadNotes(){
+  const s = document.getElementById('subj-notes').value;
+  const c = document.getElementById('ch-notes').value;
+  const ta = document.getElementById('note-text');
+  const l = document.getElementById('notes-list');
+  l.innerHTML = '';
+  if(!s || !c) return;
+  ta.value = `📘 ${s} — ${c}\n\n🔹 Key Concepts:\n- Core ideas of ${c} in ${s}\n- Definitions and theory\n\n📝 Summary:\nThis chapter covers fundamentals of ${c} in ${s}.`;
+  l.innerHTML = `<li>📘 ${s} — ${c} notes loaded above. You can edit them!</li>`;
+}
+
+/* ══════════════════════════
+   RESOURCES
+══════════════════════════ */
+let resources = [];
+function addRes(){
+  const t = document.getElementById('res-title').value.trim();
+  const l = document.getElementById('res-link').value.trim();
+  if(!t || !l){ alert('Please enter both title and link.'); return; }
+  if(!l.startsWith('http')){ alert('Link must start with http:// or https://'); return; }
+  resources.push({t, l, id: Date.now()});
+  document.getElementById('res-title').value = '';
+  document.getElementById('res-link').value = '';
+  renderRes();
+}
+function deleteResource(id){
+  resources = resources.filter(r => r.id !== id);
+  renderRes();
+}
+function renderRes(){
+  const l = document.getElementById('res-list');
+  if(!l) return;
+  l.innerHTML = '';
+  if(resources.length === 0){
+    l.innerHTML = '<li style="color:var(--muted);border:none;background:transparent">No resources added yet.</li>';
+    return;
+  }
+  resources.forEach(r => {
+    const li = document.createElement('li');
+    li.innerHTML = `<a href="${r.l}" target="_blank">${r.t}</a><button onclick="deleteResource(${r.id})" title="Delete">❌</button>`;
+    l.appendChild(li);
+  });
+}
+
+/* ══════════════════════════
+   STUDY PLAN
+══════════════════════════ */
+function loadStudyPlan(){
+  const container = document.getElementById('studyPlanContainer');
+  if(!container) return;
+  container.innerHTML = '';
+  weeklyPlan.forEach(plan => {
+    const div = document.createElement('div');
+    div.style.cssText = 'background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:10px;display:flex;align-items:center;gap:14px;';
+    div.innerHTML = `<div style="font-size:1.5rem">${getDayEmoji(plan.day)}</div><div style="flex:1"><div style="font-weight:700;font-size:.9rem">${plan.day}</div><div style="color:var(--purple-light);font-size:.83rem;font-weight:600">${plan.subject}</div><div style="color:var(--muted);font-size:.78rem;margin-top:2px">${plan.task}</div></div><button onclick="openTest('${plan.subject}')" style="background:var(--purple);color:#fff;border:none;border-radius:8px;padding:6px 12px;cursor:pointer;font-size:.78rem;white-space:nowrap">📝 Take Test</button>`;
+    container.appendChild(div);
+  });
+}
+function getDayEmoji(day){
+  const m = {Monday:'🔵',Tuesday:'🟢',Wednesday:'🟡',Thursday:'🟠',Friday:'🔴',Saturday:'🟣',Sunday:'⚪'};
+  return m[day] || '📅';
+}
+
+/* ══════════════════════════
+   GOALS / TASKS
+══════════════════════════ */
+let goalState = {};
+function loadGoals(){
+  const c1 = document.getElementById('goalsContainer');
+  const c2 = document.getElementById('goalsPageContainer');
+  [c1, c2].forEach((container, idx) => {
+    if(!container) return;
+    container.innerHTML = '';
+    goalsList.forEach((goal, index) => {
+      const key = 'g' + index;
+      if(!(key in goalState)) goalState[key] = false;
+      const div = document.createElement('div');
+      div.className = 'goal-check-item' + (goalState[key] ? ' checked' : '');
+      div.id = `gitem-${idx}-${index}`;
+      div.innerHTML = `<input type="checkbox" id="goal-${idx}-${index}" ${goalState[key]?'checked':''}><label for="goal-${idx}-${index}">${goal}</label>`;
+      div.querySelector('input').addEventListener('change', function(){
+        goalState[key] = this.checked;
+        document.querySelectorAll(`[id^="gitem-"][id$="-${index}"]`).forEach(el => {
+          el.classList.toggle('checked', this.checked);
+          el.querySelector('input').checked = this.checked;
+        });
+      });
+      container.appendChild(div);
+    });
+  });
+}
+
+/* ══════════════════════════
+   TIMER
+══════════════════════════ */
+let tLeft = 1500, tRun = false, tInt = null, pomCount = 1;
+const CIRC = 2 * Math.PI * 56;
+
+function toggleTimer(){
+  if(tRun){
+    clearInterval(tInt);
+    tRun = false;
+    document.getElementById('start-btn').textContent = '▶ Resume Focus';
+    document.getElementById('timer-display').classList.add('pulsing');
+  } else {
+    tRun = true;
+    document.getElementById('start-btn').textContent = '⏸ Pause';
+    document.getElementById('timer-display').classList.remove('pulsing');
+    tInt = setInterval(() => {
+      if(tLeft <= 0){
+        clearInterval(tInt);
+        tRun = false;
+        pomCount = Math.min(pomCount + 1, 4);
+        document.getElementById('pomodoro-label').textContent = `Pomodoro ${pomCount}/4`;
+        document.getElementById('start-btn').textContent = '▶ Start Focus';
+        document.getElementById('timer-display').classList.add('pulsing');
+        tLeft = 1500;
+        updT();
+        speakText('Pomodoro complete! Take a short break.');
+        return;
+      }
+      tLeft--;
+      updT();
+    }, 1000);
+  }
+}
+function resetTimer(){
+  clearInterval(tInt);
+  tRun = false;
+  tLeft = 1500;
+  pomCount = 1;
+  document.getElementById('start-btn').textContent = '▶ Start Focus';
+  document.getElementById('timer-display').classList.add('pulsing');
+  document.getElementById('pomodoro-label').textContent = 'Pomodoro 1/4';
+  updT();
+}
+function updT(){
+  const m = Math.floor(tLeft/60).toString().padStart(2,'0');
+  const s = (tLeft%60).toString().padStart(2,'0');
+  document.getElementById('timer-value').textContent = m+':'+s;
+  document.getElementById('timer-arc').style.strokeDashoffset = CIRC*(1 - tLeft/1500);
+}
+
+/* ══════════════════════════
+   DASHBOARD PLAN
+══════════════════════════ */
+function generateStudyPlans(){
+  const subjects = ["Maths","Physics","Chemistry","Biology","English","Computer","History","Geography"];
+  const topics = ["Practice problems","Read theory","Revision","Solve examples","Watch lecture","Make notes"];
+  const statuses = ["done","inprogress","pending"];
+  const statusText = {done:"✓ Done", inprogress:"⏳ In Progress", pending:"○ Pending"};
+  const container = document.getElementById("plan-container");
+  if(!container) return;
+  container.innerHTML = "";
+  for(let i=0; i<6; i++){
+    const subject = subjects[i % subjects.length];
+    const topic = topics[Math.floor(Math.random()*topics.length)];
+    const status = statuses[Math.floor(Math.random()*statuses.length)];
+    const startHour = 6 + (i*2) % 12;
+    const endHour = startHour + 1;
+    const div = document.createElement('div');
+    div.className = 'plan-item';
+    div.onclick = () => openTest(subject);
+    div.innerHTML = `<div class="plan-time">${startHour}:00 ${startHour>=12?"PM":"AM"}<br>– ${endHour}:00 ${endHour>=12?"PM":"AM"}</div><div class="plan-body"><strong>${subject} – Session ${i+1}</strong><span>${topic}</span></div><div class="status-badge ${status}">${statusText[status]}</div>`;
+    container.appendChild(div);
+  }
+}
+
+/* ══════════════════════════
+   TEST MODAL
+══════════════════════════ */
+function openTest(subject){
+  document.getElementById("testModal").style.display = "flex";
+  document.getElementById("testTitle").textContent = subject + " Test (50 Marks)";
+  document.getElementById("testContent").innerHTML = generateTest(subject);
+}
+function closeTest(){
+  document.getElementById("testModal").style.display = "none";
+}
+function generateTest(subject){
+  let q = `<h3>Total Marks: 50</h3><h4>Section A: MCQs (10 × 1 = 10 marks)</h4>`;
+  for(let i=1; i<=10; i++) q += `<p>${i}. ${getQuestion(subject)} <br><em>a) Option 1 &nbsp; b) Option 2 &nbsp; c) Option 3 &nbsp; d) Option 4</em></p>`;
+  q += `<h4>Section B: Short Answer (5 × 4 = 20 marks)</h4>`;
+  for(let i=1; i<=5; i++) q += `<p>${i}. ${getQuestion(subject)}</p>`;
+  q += `<h4>Section C: Long Answer (2 × 10 = 20 marks)</h4>`;
+  for(let i=1; i<=2; i++) q += `<p>${i}. ${getQuestion(subject)}</p>`;
+  return q;
+}
+function getQuestion(subject){
+  const q = {
+    Maths:["Solve x²-5x+6=0","Find the derivative of x³+2x","Calculate the area of a circle with radius 7cm"],
+    Science:["State Newton's First Law","Define velocity and acceleration","Explain Ohm's Law"],
+    Physics:["State Newton's First Law","Define velocity and acceleration","Explain Ohm's Law"],
+    Chemistry:["Define atomic number","What is a chemical reaction?","Explain the pH scale"],
+    Biology:["Explain photosynthesis","Define a cell","What is respiration?"],
+    English:["Write a short paragraph on discipline","Define noun with examples","Explain parts of speech"],
+    History:["Describe the Indus Valley Civilization","Who was Ashoka?","Explain the Mughal Empire"],
+    Geography:["Define the water cycle","Name India's longest river","Explain types of rainfall"],
+    Computer:["What is a variable in programming?","Explain HTML tags","Define binary numbers"],
+    Revision:["Summarize this week's key topics","List 5 important formulas you learned","Create a mind map of your week"]
+  };
+  const qs = q[subject] || ["Explain the topic in detail with examples","Define the main concept","Give 3 real-world applications"];
+  return qs[Math.floor(Math.random()*qs.length)];
+}
+
+/* ══════════════════════════
+   CALENDAR
+══════════════════════════ */
+let calDate = new Date();
+
+function getWeekNumber(date){
+  const d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  const dayNum = d.getUTCDay() || 7;
+  d.setUTCDate(d.getUTCDate() + 4 - dayNum);
+  const yearStart = new Date(Date.UTC(d.getUTCFullYear(),0,1));
+  return Math.ceil((((d - yearStart) / 86400000) + 1)/7);
+}
+function getMondayActivityForDate(date){
+  const weekNum = getWeekNumber(date);
+  return MONDAY_ACTIVITIES[weekNum % MONDAY_ACTIVITIES.length];
+}
+function renderCalendar(){
+  const grid = document.getElementById('cal-grid');
+  const titleEl = document.getElementById('cal-month-title');
+  const today = new Date(); today.setHours(0,0,0,0);
+  const year = calDate.getFullYear();
+  const month = calDate.getMonth();
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  titleEl.textContent = MONTHS[month] + ' ' + year;
+
+  let firstDow = new Date(year, month, 1).getDay();
+  firstDow = firstDow === 0 ? 6 : firstDow - 1;
+  const totalDays = new Date(year, month+1, 0).getDate();
+  grid.innerHTML = '';
+
+  for(let i=0; i<firstDow; i++){
+    const empty = document.createElement('div');
+    empty.className = 'cal-day empty';
+    grid.appendChild(empty);
+  }
+  for(let day=1; day<=totalDays; day++){
+    const dateObj = new Date(year, month, day); dateObj.setHours(0,0,0,0);
+    const dow = dateObj.getDay();
+    const isMonday = dow === 1;
+    const isToday = dateObj.getTime() === today.getTime();
+    const isPast = dateObj.getTime() < today.getTime();
+    const dateKey = `${year}-${String(month+1).padStart(2,'0')}-${String(day).padStart(2,'0')}`;
+    const hasStudy = !!STUDY_DATA[dateKey];
+
+    const cell = document.createElement('div');
+    let classes = 'cal-day';
+    if(isMonday) classes += ' is-monday activity-day';
+    if(isToday) classes += ' today';
+    if(isPast && !isToday) classes += ' past';
+    if(hasStudy) classes += ' has-study';
+    cell.className = classes;
+
+    const numEl = document.createElement('div');
+    numEl.className = 'cal-day-num';
+    numEl.textContent = day;
+    cell.appendChild(numEl);
+
+    if(isMonday){
+      const act = getMondayActivityForDate(dateObj);
+      const emojiEl = document.createElement('div');
+      emojiEl.className = 'cal-day-emoji';
+      emojiEl.textContent = act.emoji;
+      cell.appendChild(emojiEl);
+      cell.title = '⭐ Monday Activity: ' + act.title;
+      cell.addEventListener('click', () => showMondayActivity(dateObj, act, dateKey));
+    } else {
+      cell.addEventListener('click', () => showDayTasks(dateObj, dateKey));
+    }
+    grid.appendChild(cell);
+  }
+  document.getElementById('activity-banner').classList.remove('show');
+  document.getElementById('cal-task-popup').classList.remove('show');
+}
+
+function showMondayActivity(dateObj, act, dateKey){
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  document.getElementById('cal-task-popup').classList.remove('show');
+  document.getElementById('ab-icon').textContent = act.icon;
+  document.getElementById('ab-title').textContent = act.title;
+  document.getElementById('ab-subtitle').textContent = DAYS[dateObj.getDay()]+', '+MONTHS[dateObj.getMonth()]+' '+dateObj.getDate()+' • '+act.subtitle;
+  document.getElementById('ab-desc').textContent = act.desc;
+  const tagsEl = document.getElementById('ab-tags');
+  tagsEl.innerHTML = '';
+  act.tags.forEach(t => {
+    const span = document.createElement('span');
+    span.className = 'activity-tag';
+    span.textContent = t;
+    tagsEl.appendChild(span);
+  });
+  document.getElementById('activity-banner').classList.add('show');
+  if(STUDY_DATA[dateKey]) showDayTasks(dateObj, dateKey, true);
+}
+
+function showDayTasks(dateObj, dateKey, secondary=false){
+  const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const DAYS = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  if(!secondary) document.getElementById('activity-banner').classList.remove('show');
+  const popup = document.getElementById('cal-task-popup');
+  document.getElementById('popup-date-title').textContent = `📋 ${DAYS[dateObj.getDay()]}, ${MONTHS[dateObj.getMonth()]} ${dateObj.getDate()} — Study Sessions`;
+  const listEl = document.getElementById('popup-task-list');
+  const sessions = STUDY_DATA[dateKey];
+  if(!sessions || sessions.length === 0){
+    listEl.innerHTML = '<div style="color:var(--muted);font-size:.78rem;padding:4px 0">No study sessions scheduled.</div>';
+  } else {
+    listEl.innerHTML = '';
+    sessions.forEach(s => {
+      const item = document.createElement('div');
+      item.className = 'cal-task-item';
+      item.innerHTML = `<div class="cal-task-dot" style="background:${s.color}"></div><strong>${s.subject}</strong><span style="color:var(--muted);margin-left:auto;font-size:.75rem">${s.time}</span>`;
+      listEl.appendChild(item);
+    });
+  }
+  popup.classList.add('show');
+}
+
+function calPrev(){ calDate.setMonth(calDate.getMonth()-1); renderCalendar(); }
+function calNext(){ calDate.setMonth(calDate.getMonth()+1); renderCalendar(); }
+
+/* ══════════════════════════
+   CHATBOT — FOCUSMATE
+══════════════════════════ */
+let chatOpen=false, hist=[], capB64=null, camStr=null, micOn=false, igenOn=false, ttsOn=false, recog=null, selSubj='';
+
+function toggleChat(){
+  chatOpen = !chatOpen;
+  document.getElementById('chatWin').classList.toggle('open', chatOpen);
+  document.getElementById('chatFab').classList.toggle('open', chatOpen);
+}
+
+function buildChips(){
+  const wrap = document.getElementById('chips');
+  const feat = ["Math","Physics","Chemistry","Biology","Computer","History","English","Geography","Psychology","AI","Law","Art","Music","Astronomy","Genetics","Robotics","Data Science","Cyber Security","Web Development","Entrepreneurship"];
+  feat.forEach(s => {
+    const c = document.createElement('div');
+    c.className = 'chip';
+    c.dataset.s = s;
+    c.textContent = (SEMOJI[s]||'📚')+' '+s;
+    c.onclick = () => pickSubj(s, c);
+    wrap.appendChild(c);
+  });
+}
+
+function pickSubj(s, el){
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  el.classList.add('sel');
+  selSubj = s;
+  document.getElementById('cta').placeholder = `Ask your ${s} question here…`;
+  document.getElementById('cta').focus();
+}
+
+/* ── CORE API CALL with API key from localStorage ── */
+async function callAPI(messages, systemPrompt, maxTokens = 1800) {
+  const apiKey = getApiKey();
+  if (!apiKey) {
+    showApiModal();
+    throw new Error('NO_API_KEY');
+  }
+  const response = await fetch('https://api.anthropic.com/v1/messages', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'x-api-key': apiKey,
+      'anthropic-version': '2023-06-01',
+      'anthropic-dangerous-direct-browser-access': 'true'
+    },
+    body: JSON.stringify({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: maxTokens,
+      system: systemPrompt,
+      messages: messages
+    })
+  });
+  if (!response.ok) {
+    const err = await response.json().catch(()=>({}));
+    if (response.status === 401) throw new Error('INVALID_KEY');
+    if (response.status === 429) throw new Error('RATE_LIMIT');
+    throw new Error(err.error?.message || 'API_ERROR');
+  }
+  return response.json();
+}
+
+async function sendMsg(){
+  const ta = document.getElementById('cta');
+  const txt = ta.value.trim();
+  if(!txt && !capB64) return;
+  rmWelcome();
+  ta.value = ''; autoR(ta);
+  let content;
+  if(capB64){
+    content = [{type:'image',source:{type:'base64',media_type:'image/jpeg',data:capB64}},{type:'text',text:txt||'Please analyse this image. Identify the subject, explain any question or concept shown, and give a step-by-step solution.'}];
+    addMsg('usr', txt||'📷 (Image sent for analysis)', capB64);
+    clearImg();
+  } else {
+    content = txt;
+    addMsg('usr', txt);
+  }
+  hist.push({role:'user', content});
+  const tid = showTyping();
+  document.getElementById('sbtn').disabled = true;
+  try{
+    const d = await callAPI(hist, getSys());
+    const bot = d.content?.[0]?.text || 'Sorry, I could not get a response. Please try again!';
+    rmTyping(tid);
+    hist.push({role:'assistant', content:bot});
+    addMsg('bot', bot);
+    if(ttsOn) speakText(bot.replace(/\*\*/g,'').replace(/\*/g,'').replace(/#+/g,'').substring(0,400));
+  } catch(e){
+    rmTyping(tid);
+    if(e.message === 'NO_API_KEY'){
+      addMsg('bot','🔑 Please add your Anthropic API key first. Click the 🔑 Key button in the top right of this chat.');
+    } else if(e.message === 'INVALID_KEY'){
+      addMsg('bot','❌ Invalid API key. Please click 🔑 Key and enter a valid Anthropic API key (starts with sk-ant-).');
+      updateApiStatus();
+    } else if(e.message === 'RATE_LIMIT'){
+      addMsg('bot','⏳ Too many requests. Please wait a moment and try again!');
+    } else {
+      addMsg('bot','⚠️ Connection error: ' + e.message + '. Please check your API key and internet connection.');
+    }
+  }
+  document.getElementById('sbtn').disabled = false;
+  scrollMsgs();
+}
+
+function getSys(){
+  const sline = selSubj ? `The student has selected: **${selSubj}**. Focus on this subject unless the question is about something else.\n\n` : '';
+  return `You are FocusMate — a friendly, patient, and expert AI tutor for Indian school and college students. You cover ALL 50 subjects: ${SUBJECTS.join(', ')}.\n\n${sline}YOUR STRICT RULES:\n1. ALWAYS break your answer into clear numbered steps.\n2. Use SIMPLE language that a school student easily understands.\n3. For Mathematics: show every calculation step. Never skip steps.\n4. For formulas, write: FORMULA: [the formula]\n5. For the final answer, write: ANSWER: [the answer]\n6. For important tips, write: NOTE: [the tip]\n7. For worked examples, write: EXAMPLE: [the example]\n8. Use real-life analogies to explain abstract concepts.\n9. After your explanation, always add 1 encouraging line for the student.\n10. NEVER say "I cannot help with that" — always do your best.\n11. Keep formatting clean: use **bold** for key terms, numbered steps, and clear section breaks.`;
+}
+
+function sendQ(q){
+  rmWelcome();
+  document.getElementById('cta').value = q;
+  sendMsg();
+}
+
+function addMsg(role, text, imgB64=null){
+  const msgs = document.getElementById('msgs');
+  const now = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+  const div = document.createElement('div');
+  div.className = 'msg ' + (role==='bot'?'bot':'usr');
+  const imgH = imgB64 ? `<img src="data:image/jpeg;base64,${imgB64}" style="width:100%;border-radius:8px;margin-bottom:6px;display:block;max-height:160px;object-fit:cover;"/>` : '';
+  const fmtd = role==='bot' ? fmtBot(text) : esc(text);
+  div.innerHTML = `<div class="av">${role==='bot'?'🎯':'👩'}</div><div class="mbody"><div class="bbl">${imgH}${fmtd}</div><div class="mtime">${now}${selSubj&&role==='usr'?' · '+selSubj:''}</div></div>`;
+  msgs.appendChild(div);
+  scrollMsgs();
+}
+
+function esc(t){ return t.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+function fmtBot(text){
+  let out = '';
+  const lines = text.split('\n');
+  for(let i=0; i<lines.length; i++){
+    const ln = lines[i];
+    const sm = ln.match(/^(Step\s+)?(\d+)[.)]\s+(.+)/i);
+    if(sm){ out+=`<div class="step"><div class="snum">${sm[2]}</div><div class="stxt">${inFmt(sm[3])}</div></div>`; continue; }
+    if(ln.startsWith('FORMULA:')){ out+=`<div class="fbox">📐 ${esc(ln.replace('FORMULA:','').trim())}</div>`; continue; }
+    if(ln.startsWith('ANSWER:')){ out+=`<div class="abox">✅ ${esc(ln.replace('ANSWER:','').trim())}</div>`; continue; }
+    if(ln.startsWith('NOTE:')){ out+=`<div class="hl">💡 ${inFmt(ln.replace('NOTE:','').trim())}</div>`; continue; }
+    if(ln.startsWith('EXAMPLE:')){ out+=`<div class="hl" style="border-left-color:var(--purple)">📌 ${inFmt(ln.replace('EXAMPLE:','').trim())}</div>`; continue; }
+    if(ln.startsWith('- ')||ln.startsWith('• ')){ out+=`<div style="display:flex;gap:6px;margin:3px 0"><span style="color:var(--purple);flex-shrink:0">▸</span><span>${inFmt(ln.slice(2))}</span></div>`; continue; }
+    if(ln.startsWith('## ')){ out+=`<div style="font-weight:700;color:var(--purple-light);margin:8px 0 3px;font-size:.9rem">${esc(ln.slice(3))}</div>`; continue; }
+    if(ln.startsWith('# ')){ out+=`<div style="font-weight:700;color:var(--purple-light);margin:8px 0 3px">${esc(ln.slice(2))}</div>`; continue; }
+    if(ln.trim()===''){out+='<div style="height:6px"></div>'; continue;}
+    out+=`<div style="margin:2px 0">${inFmt(ln)}</div>`;
+  }
+  return out;
+}
+
+function inFmt(t){
+  t = esc(t);
+  t = t.replace(/\*\*(.+?)\*\*/g,'<strong>$1</strong>');
+  t = t.replace(/\*(.+?)\*/g,'<em>$1</em>');
+  t = t.replace(/`(.+?)`/g,'<code class="ic">$1</code>');
+  return t;
+}
+
+function showTyping(){
+  const msgs = document.getElementById('msgs');
+  const id = 'tp'+Date.now();
+  const d = document.createElement('div');
+  d.className = 'msg bot'; d.id = id;
+  d.innerHTML = '<div class="av">🎯</div><div class="mbody"><div class="bbl"><div class="tind"><div class="td"></div><div class="td"></div><div class="td"></div></div></div></div>';
+  msgs.appendChild(d);
+  scrollMsgs();
+  return id;
+}
+function rmTyping(id){ const e=document.getElementById(id); if(e) e.remove(); }
+function scrollMsgs(){ const m=document.getElementById('msgs'); m.scrollTop=m.scrollHeight; }
+function clearChat(){
+  document.getElementById('msgs').innerHTML='';
+  hist=[]; selSubj='';
+  document.querySelectorAll('.chip').forEach(c=>c.classList.remove('sel'));
+  document.getElementById('cta').placeholder='Type any question from any of the 50 subjects… (Enter to send)';
+  const msgs = document.getElementById('msgs');
+  const welcome = document.createElement('div');
+  welcome.className = 'cwelcome'; welcome.id = 'cwelcome';
+  welcome.innerHTML = `<div class="wi">🎯</div><h3>Hi Ananya! I'm FocusMate, your AI Tutor</h3><p>Ask me <strong>any question</strong> from all 50 subjects.</p>`;
+  msgs.appendChild(welcome);
+}
+function rmWelcome(){ const w=document.getElementById('cwelcome'); if(w) w.remove(); }
+
+/* ══════════════════════════
+   MICROPHONE
+══════════════════════════ */
+function toggleMic(){
+  if(micOn){ stopMic(); return; }
+  if(!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)){
+    addMsg('bot','⚠️ Voice input works best in Chrome or Edge browser.');
+    return;
+  }
+  const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+  recog = new SR();
+  recog.continuous = false;
+  recog.interimResults = true;
+  recog.lang = 'en-IN';
+  recog.onstart = () => {
+    micOn = true;
+    document.getElementById('micBtn').classList.add('rec');
+    document.getElementById('micLbl').textContent = '🔴 Listening…';
+    document.getElementById('vbar').classList.add('show');
+  };
+  recog.onresult = e => {
+    let t = '';
+    for(let i=e.resultIndex; i<e.results.length; i++) t += e.results[i][0].transcript;
+    document.getElementById('cta').value = t;
+    autoR(document.getElementById('cta'));
+  };
+  recog.onend = () => {
+    stopMic();
+    const v = document.getElementById('cta').value.trim();
+    if(v) sendMsg();
+  };
+  recog.onerror = e => {
+    stopMic();
+    if(e.error !== 'aborted') addMsg('bot','🎤 Could not hear clearly. Please try again!');
+  };
+  recog.start();
+}
+function stopMic(){
+  micOn = false;
+  if(recog) recog.stop();
+  document.getElementById('micBtn').classList.remove('rec');
+  document.getElementById('micLbl').textContent = '🎤 Microphone';
+  document.getElementById('vbar').classList.remove('show');
+}
+
+/* ══════════════════════════
+   TEXT TO SPEECH
+══════════════════════════ */
+function speakText(text){
+  if(!('speechSynthesis' in window)) return;
+  window.speechSynthesis.cancel();
+  const utt = new SpeechSynthesisUtterance(text);
+  utt.lang = 'en-IN';
+  utt.rate = 0.95;
+  utt.pitch = 1;
+  window.speechSynthesis.speak(utt);
+}
+function toggleTTS(){
+  ttsOn = !ttsOn;
+  document.getElementById('ttsBtn').classList.toggle('on', ttsOn);
+  document.getElementById('ttsLbl').textContent = ttsOn ? '🔊 Reading On' : 'Read Aloud';
+  if(!ttsOn) window.speechSynthesis && window.speechSynthesis.cancel();
+}
+
+/* ══════════════════════════
+   CAMERA
+══════════════════════════ */
+async function toggleCam(){
+  if(camStr){ stopCam(); return; }
+  try{
+    camStr = await navigator.mediaDevices.getUserMedia({video:{facingMode:'environment'}, audio:false});
+    document.getElementById('camvid').srcObject = camStr;
+    document.getElementById('camwrap').style.display = 'block';
+    document.getElementById('camBtn').classList.add('on');
+  } catch(e){
+    addMsg('bot','📷 Camera access denied. Please allow camera permission in your browser settings!');
+  }
+}
+function stopCam(){
+  if(camStr){ camStr.getTracks().forEach(t=>t.stop()); camStr=null; }
+  document.getElementById('camwrap').style.display = 'none';
+  document.getElementById('camvid').srcObject = null;
+  document.getElementById('camBtn').classList.remove('on');
+}
+function snapPhoto(){
+  const v = document.getElementById('camvid');
+  const c = document.getElementById('camcanvas');
+  c.width = v.videoWidth; c.height = v.videoHeight;
+  c.getContext('2d').drawImage(v,0,0);
+  const url = c.toDataURL('image/jpeg',0.85);
+  capB64 = url.split(',')[1];
+  document.getElementById('ithumb').src = url;
+  document.getElementById('ilabel').textContent = 'Photo captured! Ask your question or press send.';
+  document.getElementById('ipreview').classList.add('show');
+  stopCam();
+  rmWelcome();
+  document.getElementById('cta').placeholder = 'Ask about this photo… or press send to auto-analyse';
+  document.getElementById('cta').focus();
+}
+function clearImg(){
+  capB64 = null;
+  document.getElementById('ipreview').classList.remove('show');
+  document.getElementById('ithumb').src = '';
+  document.getElementById('cta').placeholder = selSubj ? `Ask your ${selSubj} question here…` : 'Type any question from any of the 50 subjects…';
+}
+
+/* ══════════════════════════
+   IMAGE GENERATION
+══════════════════════════ */
+function toggleIgen(){
+  igenOn = !igenOn;
+  document.getElementById('igenrow').classList.toggle('show', igenOn);
+  document.getElementById('igenBtn').classList.toggle('on', igenOn);
+  if(igenOn) document.getElementById('igeninput').focus();
+}
+
+async function genImg(promptArg){
+  const prompt = promptArg || document.getElementById('igeninput').value.trim();
+  if(!prompt) return;
+  document.getElementById('igeninput').value = '';
+  if(igenOn) toggleIgen();
+  rmWelcome();
+  addMsg('usr','🎨 Create diagram: '+prompt);
+  const tid = showTyping();
+  try{
+    const d = await callAPI(
+      [{role:'user',content:`Create a detailed educational labeled diagram: ${prompt}`}],
+      `You are an expert educational diagram creator for school students.\n\nWhen asked to draw/create/generate any diagram or image:\n1. Write 2 sentences explaining the concept\n2. Create a detailed, colorful, well-labeled SVG diagram\n3. The SVG MUST:\n   - Use viewBox="0 0 440 330"\n   - Have dark background rect fill="#12122a"\n   - Use bright, contrasting colors for elements\n   - Include clear text labels in white/light colors\n   - Be educational and accurate\n   - Have a title at the top in light text\n4. Wrap the SVG EXACTLY between <<<SVG>>> and <<<END>>> tags\n5. After the SVG, list 3 key learning points about the topic`,
+      1800
+    );
+    const raw = d.content?.[0]?.text || '';
+    rmTyping(tid);
+    const sm = raw.match(/<<<SVG>>>([\s\S]*?)<<<END>>>/);
+    const tp = raw.replace(/<<<SVG>>>[\s\S]*?<<<END>>>/g,'').trim();
+    if(tp) addMsg('bot', tp);
+    const msgs = document.getElementById('msgs');
+    const div = document.createElement('div');
+    div.className = 'msg bot';
+    const now = new Date().toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+    if(sm){
+      div.innerHTML = `<div class="av">🎯</div><div class="mbody"><div class="svgcard">${sm[1].trim()}<div class="svgcap">🎨 AI-generated diagram: "${prompt}"</div></div><div class="mtime">${now}</div></div>`;
+    } else {
+      div.innerHTML = `<div class="av">🎯</div><div class="mbody"><div class="svgcard"><svg viewBox="0 0 440 220" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block"><rect width="440" height="220" fill="#12122a"/><text x="220" y="80" text-anchor="middle" fill="#9b7fff" font-size="48">🎨</text><text x="220" y="130" text-anchor="middle" fill="#e8e8f0" font-size="16" font-family="Arial,sans-serif">${esc(prompt)}</text><text x="220" y="165" text-anchor="middle" fill="#8888aa" font-size="12" font-family="Arial,sans-serif">Visual concept created</text></svg><div class="svgcap">Visual concept: "${prompt}"</div></div><div class="mtime">${now}</div></div>`;
+    }
+    msgs.appendChild(div);
+    hist.push({role:'user',content:`Create diagram: ${prompt}`});
+    hist.push({role:'assistant',content:raw});
+  } catch(e){
+    rmTyping(tid);
+    if(e.message === 'NO_API_KEY'){
+      addMsg('bot','🔑 Please add your Anthropic API key first!');
+    } else {
+      addMsg('bot','⚠️ Could not generate image. Error: ' + e.message);
+    }
+  }
+  scrollMsgs();
+}
+
+function autoR(el){
+  el.style.height = 'auto';
+  el.style.height = Math.min(el.scrollHeight,90)+'px';
+}
+</script>
+</body>
+</html>

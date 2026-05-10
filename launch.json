@@ -1,0 +1,30 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run cros",
+            "runtimeExecutable": "cros",
+            "cwd": "${workspaceFolder}",
+            "args": []
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Run js-yaml",
+            "runtimeExecutable": "js-yaml",
+            "cwd": "${workspaceFolder}",
+            "args": []
+        },
+        {
+            "type": "msedge",
+            "request": "launch",
+            "name": "Open rev.html",
+            "file": "c:\\Users\\Win11\\OneDrive\\Desktop\\study planner\\frontend\\rev.html"
+        }
+    ]
+}
